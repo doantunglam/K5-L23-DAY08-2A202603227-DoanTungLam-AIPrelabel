@@ -1,13 +1,13 @@
 # Thông tin học viên
 
-- Họ và tên: <<>>
-- MSHV: <<>>
-- Lớp (L2 / L3 / khác): <<>>
-- Tài khoản GitHub: <<>>
-- Repo bài nộp (URL): <<>>
+- Họ và tên: Doãn Tùng Lâm
+- MSHV: 2A202603227
+- Lớp (L2 / L3 / khác): L2
+- Tài khoản GitHub: doantunglam
+- Repo bài nộp (URL): https://github.com/doantunglam/K5-L23-DAY08-2A202603227-DoanTungLam-AIPrelabel
 - Commit chốt bài (hash): <<>>
-- Máy: <<hệ điều hành, GPU (CUDA / MPS / không có)>>
-- CVAT (Docker): <<phiên bản, ví dụ v2.81.0>>
+- Máy: Windows 11, NVIDIA GeForce RTX 4060 Laptop GPU 8 GB (CUDA 12.4, torch 2.6.0+cu124)
+- CVAT (Docker): v2.81.0
 
 ## Kết quả tóm tắt (điền cuối bài; số lấy từ `submission/qc/*`, kèm mẫu số)
 
