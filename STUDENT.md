@@ -5,7 +5,7 @@
 - Lớp (L2 / L3 / khác): L2
 - Tài khoản GitHub: doantunglam
 - Repo bài nộp (URL): https://github.com/doantunglam/K5-L23-DAY08-2A202603227-DoanTungLam-AIPrelabel
-- Commit chốt bài (hash): <<>>
+- Commit chốt bài (hash): a610507c0e4008601bcd3af4364a770d5104baea
 - Máy: Windows 11, NVIDIA GeForce RTX 4060 Laptop GPU 8 GB (CUDA 12.4, torch 2.6.0+cu124)
 - CVAT (Docker): v2.81.0
 
