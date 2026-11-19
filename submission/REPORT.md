@@ -51,9 +51,11 @@
 
 | Ảnh | SAM (phiên bản) | Số click | Mask gồm người lái / hàng hoá? | Lỗi quan sát | File trong `masks/` |
 |---|---|---|---|---|---|
-| <<img_0xx>> | <<>> | <<>> | <<>> | <<>> | <<>> |
+| img_013 (tuk-tuk Thái, có tài xế và hành khách) | SAM 2.1 base (`sam2.1_b.pt`) | 6 (3 dương, 3 âm) | Mask phủ cả xe, mui và khung; tài xế và hành khách bị phủ **một phần** (loang lổ, có lỗ), không loại sạch dù đã click âm lên tài xế và hành khách; hàng hoá không có | Mask lấn vào người trong xe (tài xế phủ phần lớn, khách phủ rời rạc); 1 polygon, 43.7% ảnh | `masks/tuktuk_img013.jpg` |
+| img_010 (xích lô đầu hàng, nhìn từ sau, có người đạp) | SAM 2.1 base (`sam2.1_b.pt`) | 5 (3 dương, 2 âm) | Mask bám mui đỏ, khung, bánh và yên; **không** gồm người đạp (click âm lên người đạp có tác dụng); không có hàng | Mask bị chia 4 mảnh do người đạp che giữa xe; nan khung mảnh bị cắt rời rạc; 11.3% ảnh | `masks/cyclo_img010.jpg` |
+| img_023 (tuk-tuk đỏ ở giữa, bị tuk-tuk xanh phía trước che một phần) | SAM 2.1 base (`sam2.1_b.pt`) | 5 (3 dương, 2 âm) | Mask gồm mui, thân và bánh của xe giữa, không gồm người đàn ông áo vàng đứng cạnh (click âm đúng chỗ); không có hàng | Mép chỗ giáp xe xanh phía trước cắt khá sạch; chỗ khuất sau xe trước không đoán thêm (đúng nguyên tắc chỉ vẽ phần nhìn thấy); 7.1% ảnh | `masks/tuktuk_mid_img023.jpg` |
 
-- Đối chiếu guideline mục 4.2: quy tắc nào giúp, quy tắc nào thiếu? <<>>
+- Đối chiếu guideline mục 4.2: quy tắc nào giúp, quy tắc nào thiếu? Giúp: (3) chỉ mask phần nhìn thấy và (4) hai vật chạm nhau không chồng lên nhau: ở img_023 phần giáp xe giữa và xe trước thuộc xe phía trước, mask xe giữa không lấn sang; quy tắc lỗ thủng (2) giúp quyết định bỏ phần khung hở xích lô (img_010) ra khỏi mask. Thiếu: mục 4.2 không nói người ngồi trong xe có tính thuộc mask xe không, và kính chắn gió (câu mở số 5, mục 6) nên ở img_013 không biết nên loại hay giữ phần người nhìn qua cạnh hở; phần người nằm sau thanh chắn làm mask loang lổ nên chưa theo được quy tắc 4.1.4 (một box `person` riêng, xe một mask riêng). Đề xuất đưa vào v1.1: mask xe loại bỏ người ngồi bên trong.
 - *(Tuỳ chọn)* Interactor SAM trong CVAT: làm được / không (lỗi gì, đã thử gì); khác gì offline: <<>>
 
 ## 6. Calibration (Part 6)
