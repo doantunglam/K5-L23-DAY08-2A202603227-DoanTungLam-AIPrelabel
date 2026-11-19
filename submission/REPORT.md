@@ -36,7 +36,11 @@
 
 ## 4. Máy có đáng dùng không?
 
-- Thời gian (từ `time_log.csv`): gán tay 16 phút / 4 ảnh = 4.0 phút/ảnh vs duyệt 146 phút / 24 ảnh = 6.1 phút/ảnh. Thiên lệch (bạn gán gold trước nên đã quen cảnh): <<>>
+- Thời gian (từ `time_log.csv`): gán tay 16 phút / 4 ảnh = 4.0 phút/ảnh vs duyệt 146 phút / 24 ảnh = 6.1 phút/ảnh.
+- Thiên lệch (bạn gán gold trước nên đã quen cảnh): có ít nhất ba thiên lệch làm so sánh này không công bằng.
+  - (1) Tôi gán gold trước nên đã quen kiểu ảnh phố và các quy tắc guideline (xe ba bánh, người ngồi sau xe), nên lượt duyệt đáng lẽ nhanh hơn, vậy mà vẫn chậm hơn gán tay mỗi ảnh.
+  - (2) Hai tập ảnh không cùng độ khó: gold có 60 đối tượng / 4 ảnh = 15 đối tượng/ảnh, còn batch có 541 / 24 = 22.5 đối tượng/ảnh (máy gợi ý 614 box, hơn 25 box/ảnh), nhiều ảnh đêm và ảnh dày xe máy (img_005, img_018, img_024, img_026, img_029), nên phần chậm hơn một phần do ảnh dày hơn, không chỉ do duyệt.
+  - (3) Gold chỉ 4 ảnh nên 4.0 phút/ảnh là ước lượng thô
 - Kết luận: có cho `person`, `car`, `bus`, `bicycle` (giữ nguyên 260/272 = 96% box `person`; sửa ít) và dùng có điều kiện cho `motorbike`; không nên tin `three_wheeler` của YOLOE mà không duyệt kỹ (chỉ 6/40 = 15% box được giữ nguyên), dựa trên `qc/review_stats.md` (accepted 79.8%, bắt bẫy 10/12).
 - **Ba quy tắc giảm thiên kiến của bạn** (mỗi quy tắc kiểm tra được bằng số hoặc việc làm):
   1. Với mỗi ảnh, đếm vật bằng mắt trước khi bật nhãn máy (Bước 0) và ghi số đếm vào ghi chú; kiểm tra: số đếm so với tổng sau duyệt không lệch quá vài vật.
