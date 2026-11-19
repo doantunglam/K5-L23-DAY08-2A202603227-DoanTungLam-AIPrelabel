@@ -6,14 +6,14 @@
 
 | Lớp | Model + cỡ | Ngưỡng | Vì sao (dẫn `run_id` trong `model_log.csv`) |
 |---|---|---|---|
-| person / bicycle / motorbike / car / bus / truck | <<YOLO26m>> | <<theo lớp, từ threshold_sweep>> | <<>> |
-| three_wheeler | <<YOLOE-26s, prompt: ...>> | <<>> | <<>> |
+| person / bicycle / motorbike / car / bus / truck | YOLO26m | person 0.3 (mặc định), bicycle 0.2, motorbike 0.1, car 0.65, bus 0.3 (mặc định), truck 0.3 (mặc định) | r02 (conf 0.25) và r03 (conf 0.5): 0.5 mất nhiều người và xe máy ở xa (img_007 person 15 -> 6), nên không dùng một ngưỡng cao chung. `threshold_sweep` (4 ảnh gold, mục tiêu recall 90%): bicycle 0.2 đạt recall 5/5, precision 5/6; motorbike 0.1 đạt recall 11/12 nhưng precision chỉ 11/25; person và car không đạt 90% ở ngưỡng nào ≤ 0.5 (recall tối đa 18/24 và 7/8): person giữ mặc định 0.3; car recall 7/8 không đổi đến ngưỡng 0.85 nên tăng lên 0.65 để giảm box thừa từ 7 xuống 3 mà không mất recall (bỏ ngưỡng cao hơn vì gold chỉ có 8 ô tô); bus (1 vật) và truck (0 vật) dưới 5 vật nên không chọn ngưỡng riêng. |
+| three_wheeler | YOLOE-26s, prompt mặc định của taxonomy (`--classes three_wheeler`) | 0.15 | r04: bắt đúng tuk-tuk và xích lô rõ (img_002, img_032); r05 (prompt "three-wheeled vehicle") thêm báo sai trên xe máy nên không dùng; r06 (prompt "tuk-tuk") chỉ bắt 1/3 xích lô ở img_032. Sweep: 0.15 đạt recall 7/7, precision 7/9; ở 0.3 recall giảm còn 5/7. |
 
-- Lệnh `merge_prelabels.py` đã dùng (dán nguyên): <<>>
-- **Phiên bản SAM bạn chọn** (SAM 1 / 2.1 / 3) và lý do: <<chất lượng mask, tốc độ, RAM, quyền truy cập>>
-- Lỗi nào **không sửa được bằng đổi ngưỡng** (ví dụ tuk-tuk bị gọi `car`)? Sửa thế nào? <<>>
-- Box **điểm cao mà sai** hoặc **điểm thấp mà đúng** (ảnh nào): <<>>
-- Giới hạn: chọn ngưỡng trên chính gold (4 ảnh) nên số đo máy trên gold là lạc quan: <<>>
+- Lệnh `merge_prelabels.py` đã dùng (dán nguyên): `python scripts/merge_prelabels.py work/prelabel/yoloe_all/pre.coco.json work/prelabel/y26_all/pre.coco.json --thr "bicycle=0.2,motorbike=0.1,three_wheeler=0.15,car=0.65" --conf 0.3 --iou 0.6 --split "batch,gold" --out work/prelabel/merged_review/pre.coco.json` (ra 705 box cho 24 ảnh batch + 4 ảnh gold; ảnh gold không nạp vào CVAT).
+- **Phiên bản SAM bạn chọn** (SAM 1 / 2.1 / 3) và lý do: SAM 2.1 base (`sam2.1_b.pt`). Mask bám đường biên tốt khi box đúng (r07, img_004: người và tuk-tuk xanh); chạy được bằng GPU 8 GB, không cần quyền truy cập đặc biệt như SAM 3 (gated). Chậm hơn YOLO26 (3.56 s/ảnh so với 0.74 s/ảnh ở r07 và r02). Chưa so với SAM 1 / mobile_sam.
+- Lỗi nào **không sửa được bằng đổi ngưỡng** (ví dụ tuk-tuk bị gọi `car`)? Sửa thế nào? YOLO26 không có lớp `three_wheeler` nên tuk-tuk bị gọi `car` (r07: img_004, img_013), xích lô bị gọi `bicycle` (r02: img_032) hoặc `motorbike` (img_007); bán tải và SUV bị gọi `truck` (img_002, img_019). Đổi ngưỡng chỉ bớt hoặc thêm box, không đổi được lớp. Cách sửa: lấy `three_wheeler` từ YOLOE, còn lớp xe khác lấy từ YOLO26, và khi review phải kiểm tay box `truck` và các box `car` nằm đè lên box `three_wheeler`.
+- Box **điểm cao mà sai** hoặc **điểm thấp mà đúng** (ảnh nào): Điểm cao mà sai: img_002 bán tải bị gọi `truck` 0.73 (r02) và `three_wheeler` 0.56 (r05); img_013 tuk-tuk bị gọi `car` 0.41 (r07). Điểm thấp mà đúng: xích lô xa ở img_032 chỉ 0.27 (r04) nên bị ngưỡng 0.3 cắt; xe máy nhỏ ở xa img_007 và img_015 điểm 0.27–0.4.
+- Giới hạn: chọn ngưỡng trên chính gold (4 ảnh) nên số đo máy trên gold là lạc quan: ngưỡng được chọn và chấm trên cùng dữ liệu, và chỉ có 4 ảnh (24 người, 12 xe máy, 8 ô tô, 7 xe ba bánh, 5 xe đạp, 1 xe buýt, 0 xe tải) nên bicycle, three_wheeler dựa trên 5–7 vật, bus 1 vật, truck 0 vật. Ngưỡng car 0.65 chỉ dựa trên 8 ô tô gold nên có thể bỏ sót ô tô bị che khuất ở ảnh batch. Ngưỡng motorbike 0.1 đổi precision (11/25) lấy recall (11/12): lúc review sẽ phải xoá nhiều box thừa, và nếu chọn 0.2 thì precision 10/15, recall 10/12.
 
 ## 2. AI error profile (từ `qc/review_stats.md`)
 
