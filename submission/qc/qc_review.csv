@@ -1,0 +1,9 @@
+image,object_id,error_type,reviewer,note
+img_003.jpg,,khong,Doãn Tùng Lâm,"Không thấy lỗi rõ; box xe ba gác #1 hơi rộng bên phải (khoảng 20 px), cần xem lại"
+img_006.jpg,64,thua,Doãn Tùng Lâm,motorbike 0.10 chồng lên cụm xe máy đỗ bên trái; theo CAL-06 nên gộp ignore_region hoặc xoá box trùng
+img_006.jpg,70,thua,Doãn Tùng Lâm,motorbike 0.28 trùng/chồng trong cụm xe đỗ bên trái (CAL-06)
+img_006.jpg,71,thua,Doãn Tùng Lâm,motorbike 0.28 trùng/chồng trong cụm xe đỗ bên trái (CAL-06)
+img_006.jpg,72,thua,Doãn Tùng Lâm,motorbike 0.33 trùng/chồng trong cụm xe đỗ bên trái (CAL-06)
+img_014.jpg,,khong,Doãn Tùng Lâm,Không thấy lỗi rõ
+img_031.jpg,,khong,Doãn Tùng Lâm,Không thấy lỗi; hàng nhô ra khoảng 18% (< 20%) nên box xe đạp đúng theo CAL-07
+img_035.jpg,520,thua,Doãn Tùng Lâm,motorbike 0.14 trùng với motorbike #530 (0.47) ở cùng vị trí

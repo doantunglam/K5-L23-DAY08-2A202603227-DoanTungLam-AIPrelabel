@@ -60,20 +60,20 @@
 
 ## 6. Calibration (Part 6)
 
-- Số quyết định: <<>> (`calibration_decisions.csv`); quan trọng nhất (dẫn `CAL-xx`): <<>>
-- Quy tắc mới đã vào `guideline_v1.1_calibrated.md`: <<>>
-- Nguyên nhân gốc: <<guideline mơ hồ / chưa nắm quy tắc / máy>>
+- Số quyết định: 7 (`calibration_decisions.csv`: CAL-01 đến CAL-07; 2 `can_review`, 3 `cau_hoi_mo`, 2 `loi_may`); quan trọng nhất: CAL-04 (xe ba bánh luôn là `three_wheeler`: YOLO26 gọi tuk-tuk và xích lô là `car`, `bicycle`, `motorbike`, và `three_wheeler` là lớp máy tệ nhất, chỉ 6/40 box được giữ nguyên) và CAL-06 (cụm xe máy đỗ dày: vẽ từng xe hay `ignore_region`, vì đây là kiểu lỗi `thua` lặp lại ở bước QC).
+- Quy tắc mới đã vào `guideline_v1.1_calibrated.md`: chốt câu mở #2 (xe máy đỗ dày: ngưỡng 20 px, che quá nửa thì `ignore_region`), #3 (hàng nhô ≤ 20% chiều dài xe thuộc box xe), #4 (thay "20% diện tích" bằng tiêu chí "thấy rõ đầu hoặc thân trên liên tục"), #5 (kính thuộc xe, người sau kính không tính là che; mask xe không phủ người bên trong); thêm quy tắc xe ba bánh luôn là `three_wheeler`, hàng nhiều không đổi lớp, mái che / ô dù / quang gánh không phải vật thuộc lớp nào. Chưa chốt: #1 (xe đạp điện), #6, #7, vì chưa có ví dụ rõ trong 28 ảnh.
+- Nguyên nhân gốc: pha trộn. Guideline mơ hồ: CAL-01, 02, 03, 06, 07 (câu mở #2, #3, #4, #5). Máy: CAL-04, 05 (YOLO26 không có lớp `three_wheeler`; YOLOE nhầm mái che, quang gánh và xe máy chở hàng). Chưa thấy ca nào do chưa nắm quy tắc.
 
 ## 7. QC và quyết định (Part 6)
 
-- Mẫu: <<n>> ảnh (<<m>> ảnh `can_review` + <<k>> ngẫu nhiên, seed 42); người kiểm: bạn (**hạn chế**: bạn vừa là người duyệt).
-- Lỗi theo **đối tượng**: <<.../... = ...%>> · theo **ảnh**: <<.../... = ...%>> (ngưỡng Release ≤ 2%)
-- Top lỗi (trong: bỏ sót, thừa, sai lớp, sai vị trí/kích thước, sai thuộc tính, sai mask) + một ảnh ví dụ mỗi loại: <<>>
-- **Giới hạn mẫu nhỏ** (cận trên 95% trong `qc_report_auto.md`): <<>>
-- Script kiểm được / không kiểm được (ví dụ ôm sát, cùng bỏ sót với máy, theo checklist thật): <<>>
+- Mẫu: 5 ảnh (0 ảnh `can_review` + 5 ngẫu nhiên, seed 42: img_003, img_006, img_014, img_031, img_035), 109 đối tượng; người kiểm: Doãn Tùng Lâm.
+- Lỗi theo **đối tượng**: 5/109 = 4.6% · theo **ảnh**: 2/5 = 40.0% (ngưỡng Release ≤ 2%), nguồn `qc/qc_report_auto.md`.
+- Top lỗi: `thua` (box thừa) 5/5 lỗi, không có lỗi bỏ sót, sai lớp, sai vị trí, sai thuộc tính hay sai mask trong mẫu. Ví dụ: img_006 (4 box `motorbike` điểm thấp 0.10–0.33 chồng lên cụm xe đỗ bên trái: #64, #70, #71, #72) và img_035 (#520 `motorbike` 0.14 trùng #530 0.47).
+- **Giới hạn mẫu nhỏ** (cận trên 95% trong `qc_report_auto.md`): 2 ảnh lỗi trong 5 ảnh mẫu, cận trên 95% (Wilson) của tỉ lệ ảnh lỗi thật là 77%. Ngưỡng 2% không thể được chứng minh bằng 5 ảnh. Mẫu cũng không có ảnh dày xe nào (img_005, img_018, img_024, img_026, img_029) nên lỗi thật trên toàn lô có thể cao hơn 4.6%.
+- Script kiểm được / không kiểm được (ví dụ ôm sát, cùng bỏ sót với máy, theo checklist thật): kiểm được số lỗi theo phiếu, tỉ lệ accepted / edited / deleted / added, bắt bẫy. Không kiểm được box có ôm sát vật thật không (ví dụ 2 bẫy `loose` ở img_024 và img_029 lọt, bắt bẫy `loose` chỉ 1/3), vật mà cả người duyệt lẫn máy cùng bỏ sót ngoài gold, và việc duyệt có theo đúng checklist hay không.
 
-**Quyết định: <<Release / Hold / Rework>>**, ngày <<YYYY-MM-DD>>. Lý do (đi theo Hold → Rework → Release): <<>>
-Nếu Rework / Hold, việc cần làm tiếp: <<>>
+**Quyết định: Rework**, ngày 2026-11-19. Lý do (đi theo Hold → Rework → Release): Không Hold vì guideline đủ rõ để gán nhãn (3 câu mở #1, #6, #7 chưa chốt nhưng không gây lỗi nào trong mẫu) và dữ liệu hợp lệ (`validate_labels.py` sạch). Rework vì ảnh có lỗi 2/5 = 40% vượt xa ngưỡng 2%, lỗi `thua` chiếm 5/5 lỗi nên là lỗi hệ thống (box máy điểm thấp chồng lên cụm xe đỗ, hệ quả của ngưỡng `motorbike=0.1`), và bắt bẫy `loose` chỉ 1/3. Không thể Release.
+Nếu Rework / Hold, việc cần làm tiếp: xoá 5 box thừa (img_006 #64, #70, #71, #72; img_035 #520) hoặc gộp cụm xe đỗ của img_006 thành `ignore_region` theo CAL-06; rà các ảnh dày xe còn lại (img_005, img_018, img_024, img_026, img_029) tìm box trùng cùng kiểu; cân nhắc tăng ngưỡng `motorbike` lên 0.25 để giảm box thừa; export `submission/labels/qc_fixed.json`, chạy lại `build_release.py` và `qc_sample.py --force`, ghi kết quả vòng sau vào báo cáo.
 
 ## 8. Ghi chú cá nhân
 
@@ -86,6 +86,6 @@ Nếu Rework / Hold, việc cần làm tiếp: <<>>
   - `img_020`, `person`: tài xế tuk-tuk bên phải, nhìn qua kính chắn gió, bị khung mui và thanh chắn che. Cùng vấn đề ngưỡng 20% (câu mở số 4), thêm câu mở số 5: kính chắn gió có thuộc xe không, nên người nhìn xuyên kính có tính là bị che không.
 - Máy / GPU / CVAT dùng; vướng mắc cài đặt:
   - Windows 11, RTX 4060 Laptop 8 GB, CVAT v2.81.0 (Docker). CVAT 2.81 không nhận `"values": []` cho thuộc tính nhãn trong `labels_generated.json` ("attribute values must be a non-empty array"); đã dán bản sửa `values: [""]` cho `conf` và `["false"]` cho `can_review`. `check_submission.py` dùng regex `\d{5,}` cho MSHV nên không nhận MSHV có chữ cái (`2A202603227`).
-- Dùng cache `data/cache/` thay vì tự chạy? <<không / có, vì ...>>
+- Dùng cache `data/cache/` thay vì tự chạy? Không: đã tự chạy `prelabel.py` cho YOLO26 và YOLOE trên toàn bộ 36 ảnh (run r08 và r09 trong `work/runs.csv`).
 - Lỗi / bug script đã gặp (nếu có): <<>>
 - Một điều bạn làm khác lần sau: <<>>
