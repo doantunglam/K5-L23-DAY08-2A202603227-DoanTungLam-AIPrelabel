@@ -56,7 +56,7 @@
 | img_023 (tuk-tuk đỏ ở giữa, bị tuk-tuk xanh phía trước che một phần) | SAM 2.1 base (`sam2.1_b.pt`) | 5 (3 dương, 2 âm) | Mask gồm mui, thân và bánh của xe giữa, không gồm người đàn ông áo vàng đứng cạnh (click âm đúng chỗ); không có hàng | Mép chỗ giáp xe xanh phía trước cắt khá sạch; chỗ khuất sau xe trước không đoán thêm (đúng nguyên tắc chỉ vẽ phần nhìn thấy); 7.1% ảnh | `masks/tuktuk_mid_img023.jpg` |
 
 - Đối chiếu guideline mục 4.2: quy tắc nào giúp, quy tắc nào thiếu? Giúp: (3) chỉ mask phần nhìn thấy và (4) hai vật chạm nhau không chồng lên nhau: ở img_023 phần giáp xe giữa và xe trước thuộc xe phía trước, mask xe giữa không lấn sang; quy tắc lỗ thủng (2) giúp quyết định bỏ phần khung hở xích lô (img_010) ra khỏi mask. Thiếu: mục 4.2 không nói người ngồi trong xe có tính thuộc mask xe không, và kính chắn gió (câu mở số 5, mục 6) nên ở img_013 không biết nên loại hay giữ phần người nhìn qua cạnh hở; phần người nằm sau thanh chắn làm mask loang lổ nên chưa theo được quy tắc 4.1.4 (một box `person` riêng, xe một mask riêng). Đề xuất đưa vào v1.1: mask xe loại bỏ người ngồi bên trong.
-- *(Tuỳ chọn)* Interactor SAM trong CVAT: làm được / không (lỗi gì, đã thử gì); khác gì offline: <<>>
+- *(Tuỳ chọn)* Interactor SAM trong CVAT: chưa thử; cả 3 mask ở trên đều tạo offline bằng `scripts/sam2_points.py` với `sam2.1_b.pt` (click dương và âm trên ảnh gốc), nên chưa so được với Interactor trong CVAT.
 
 ## 6. Calibration (Part 6)
 
@@ -87,5 +87,5 @@ Nếu Rework / Hold, việc cần làm tiếp: xoá 5 box thừa (img_006 #64, #
 - Máy / GPU / CVAT dùng; vướng mắc cài đặt:
   - Windows 11, RTX 4060 Laptop 8 GB, CVAT v2.81.0 (Docker). CVAT 2.81 không nhận `"values": []` cho thuộc tính nhãn trong `labels_generated.json` ("attribute values must be a non-empty array"); đã dán bản sửa `values: [""]` cho `conf` và `["false"]` cho `can_review`. `check_submission.py` dùng regex `\d{5,}` cho MSHV nên không nhận MSHV có chữ cái (`2A202603227`).
 - Dùng cache `data/cache/` thay vì tự chạy? Không: đã tự chạy `prelabel.py` cho YOLO26 và YOLOE trên toàn bộ 36 ảnh (run r08 và r09 trong `work/runs.csv`).
-- Lỗi / bug script đã gặp (nếu có): <<>>
-- Một điều bạn làm khác lần sau: <<>>
+- Lỗi / bug script đã gặp (nếu có): `scripts/check_submission.py` dòng 48 dùng regex `(\d{5,})` để bắt MSHV trong tiêu đề README, chỉ nhận MSHV toàn chữ số, nên MSHV của tôi (`2A202603227`, có chữ `A`) bị báo lỗi "README.md phải có dòng tiêu đề" dù tiêu đề đúng mẫu `SUBMISSION.md`, và phép kiểm `traps_key.json` khớp MSHV bị bỏ qua. Đã sửa regex thành `([0-9A-Za-z]{5,})` ở máy tôi để chạy kiểm tra; chưa có xác nhận từ giảng viên và script chấm có thể vẫn dùng bản gốc. Tôi không đổi MSHV trong tiêu đề.
+- Một điều bạn làm khác lần sau: Không chọn ngưỡng `motorbike=0.1` chỉ vì đạt recall 90% trên 4 ảnh gold (precision chỉ 11/25). Ngưỡng đó sinh nhiều box thừa chồng lên các cụm xe đỗ (img_006, img_035), và cả 5/5 lỗi ở bước QC là loại `thua`. Lần sau tôi sẽ thử ngưỡng 0.25 (số box phải sửa trên gold chỉ 7 so với 16 ở 0.1) rồi so số box phải xoá khi review, và chọn mẫu QC có cả các ảnh dày xe (img_005, img_018, img_024, img_026, img_029) thay vì chỉ 5 ảnh ngẫu nhiên.
