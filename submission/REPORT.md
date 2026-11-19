@@ -19,27 +19,29 @@
 
 | Trạng thái | Số | Tỉ lệ | Mẫu số |
 |---|---|---|---|
-| accepted | <<>> | <<>> | <<box máy>> |
-| edited | <<>> | <<>> | <<>> |
-| deleted | <<>> | <<>> | <<>> |
-| added | <<>> | <<>> | <<đối tượng sau duyệt>> |
+| accepted | 479 | 79.8% | 600 box máy (24 ảnh batch+gold; đã loại 27 đối tượng quanh bẫy) |
+| edited | 19 | 3.2% | 600 box máy |
+| deleted | 98 | 16.3% | 600 box máy |
+| added | 29 | 5.5% | 527 đối tượng sau duyệt |
 
-- Lớp nào máy tệ nhất? Vì sao (dẫn ảnh)? <<>>
-- So với gold: precision / recall của **máy** <<>> (mẫu số: <<đối tượng gold>>)
+(Nguồn: `qc/review_stats.md`, chạy sau khi export `batch_reviewed.json`. Trong 98 deleted + 29 added có 9 ca đổi lớp, nên máy sót thật khoảng 20 vật.)
+
+- Lớp nào máy tệ nhất? Vì sao (dẫn ảnh)? `three_wheeler`: chỉ 6/40 box được giữ nguyên (accepted), 11 sửa, 23 xoá (23/40 = 58% bị xoá). Máy (YOLOE) gán `three_wheeler` cho mái che, ô dù, quang gánh và xe máy chở hàng (img_003, img_005, img_009, img_014, img_018), và hay chia một xe thành hai box hoặc gộp hai xe thành một (img_010, img_013, img_023, img_035). Tiếp theo là `car`: 16 ô tô bị máy sót, hầu hết ở ảnh đêm img_024 (hàng xe phía xa). `motorbike` có 54/234 = 23% box bị xoá, phần lớn là box trùng hoặc cao dưới 20 px ở các ảnh dày (img_005, img_018, img_026, img_034), hệ quả của ngưỡng 0.1.
+- So với gold: precision / recall của **máy** 62.3% / 84.2% (TP 48, FP 29, FN 9; mẫu số: 77 box máy cho precision, 57 đối tượng gold cho recall; khoảng tin cậy 95%: 51–72% và 73–91%; số đo lạc quan vì ngưỡng chọn trên chính 4 ảnh gold).
 
 ## 3. Thiên kiến tự động hóa và ảnh bẫy
 
-- Bắt bẫy: <<.../12>>; loại nào lọt: <<>>; vì sao (bạn đã bỏ bước nào của checklist)? <<>>
-- Accepted cao mà bắt bẫy thấp (hoặc ngược lại) nói gì về cách bạn duyệt? <<>>
+- Bắt bẫy: 10/12 = 83.3% (khoảng tin cậy 95%: 55–95%; ngưỡng đạt 80%). Bắt đủ missing 3/3, extra 3/3, wrong_class 3/3; loại lọt là `loose` (box lỏng), bắt 1/3: lọt ở img_024 và img_029. Vì sao: bước 4 (box lỏng) là bước yếu nhất của lượt duyệt đầu, vì hai ảnh lọt đều là ảnh đêm, rất dày xe, box lệch ít pixel khó thấy bằng mắt.
+- Accepted cao (79.8%) mà bắt bẫy vẫn đạt 83.3% nói gì về cách duyệt? Giữ nguyên phần lớn box máy không làm mất khả năng bắt lỗi rõ (thừa, sót, sai lớp: 9/9), nhưng lỗi nhỏ như box lỏng thì dễ lọt khi accepted cao: cần bước kiểm cạnh box riêng thay vì chỉ nhìn đối tượng có được bao hay không.
 
 ## 4. Máy có đáng dùng không?
 
-- Thời gian (từ `time_log.csv`): gán tay <<... phút/ảnh>> vs duyệt <<... phút/ảnh>>. Thiên lệch (bạn gán gold trước nên đã quen cảnh): <<>>
-- Kết luận: <<có / không / chỉ cho lớp nào>>, dựa trên <<số liệu>>
+- Thời gian (từ `time_log.csv`): gán tay 16 phút / 4 ảnh = 4.0 phút/ảnh vs duyệt 146 phút / 24 ảnh = 6.1 phút/ảnh. Thiên lệch (bạn gán gold trước nên đã quen cảnh): <<>>
+- Kết luận: có cho `person`, `car`, `bus`, `bicycle` (giữ nguyên 260/272 = 96% box `person`; sửa ít) và dùng có điều kiện cho `motorbike`; không nên tin `three_wheeler` của YOLOE mà không duyệt kỹ (chỉ 6/40 = 15% box được giữ nguyên), dựa trên `qc/review_stats.md` (accepted 79.8%, bắt bẫy 10/12).
 - **Ba quy tắc giảm thiên kiến của bạn** (mỗi quy tắc kiểm tra được bằng số hoặc việc làm):
-  1. <<>>
-  2. <<>>
-  3. <<>>
+  1. Với mỗi ảnh, đếm vật bằng mắt trước khi bật nhãn máy (Bước 0) và ghi số đếm vào ghi chú; kiểm tra: số đếm so với tổng sau duyệt không lệch quá vài vật.
+  2. Duyệt riêng một lượt chỉ để kiểm cạnh box (bước 4) cho ảnh đêm hoặc ảnh dày; kiểm tra: tỉ lệ bắt bẫy loại `loose` tăng từ 1/3 lên ít nhất 2/3 ở lượt chạy sau.
+  3. Với lớp `three_wheeler` luôn duyệt từng box, không dùng accepted hàng loạt; kiểm tra: tỉ lệ accepted của lớp này (hiện 15%) được báo riêng khỏi tỉ lệ tổng.
 
 ## 5. Mask SAM cho 3 vật (Part 5)
 
